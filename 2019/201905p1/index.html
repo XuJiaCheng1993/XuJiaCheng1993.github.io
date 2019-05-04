@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+
+    
+
+    
+    <title>Matplotlib绘制动态实时曲线的方法改进 | 脑荼地NaoTuDi</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <meta name="keywords" content="Python,matplotlib">
+    
+    <meta name="description" content="很多时候，我们需要实时的绘制曲线，如实时的绘制串口接收到的数据。最先想到的解决策略是类似于Matlab种的drawnow函数。 在python中Matplotlib库有着和Matlan绘图库相似的功能，但是并没有drawnow这样的函数。 已有的解决方案 通过网上现有的资料 基于Python实现matplotlib中动态更新图片(交互式绘图)，可以通过打开Matplotlib的交互模式来实现实时">
+<meta name="keywords" content="Python,matplotlib">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Matplotlib绘制动态实时曲线的方法改进">
+<meta property="og:url" content="http://naotudi.top/2019/201905p1/index.html">
+<meta property="og:site_name" content="脑荼地NaoTuDi">
+<meta property="og:description" content="很多时候，我们需要实时的绘制曲线，如实时的绘制串口接收到的数据。最先想到的解决策略是类似于Matlab种的drawnow函数。 在python中Matplotlib库有着和Matlan绘图库相似的功能，但是并没有drawnow这样的函数。 已有的解决方案 通过网上现有的资料 基于Python实现matplotlib中动态更新图片(交互式绘图)，可以通过打开Matplotlib的交互模式来实现实时">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/7906342-8c69a9ccbe4ee0b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-05-04T08:10:45.080Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Matplotlib绘制动态实时曲线的方法改进">
+<meta name="twitter:description" content="很多时候，我们需要实时的绘制曲线，如实时的绘制串口接收到的数据。最先想到的解决策略是类似于Matlab种的drawnow函数。 在python中Matplotlib库有着和Matlan绘图库相似的功能，但是并没有drawnow这样的函数。 已有的解决方案 通过网上现有的资料 基于Python实现matplotlib中动态更新图片(交互式绘图)，可以通过打开Matplotlib的交互模式来实现实时">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/7906342-8c69a9ccbe4ee0b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+    
+
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/titillium-web/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/3.3.1/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+
+
+</head>
+</html>
+<body>
+    <div id="wrap">
+        <header id="header">
+    <div id="header-outer" class="outer">
+        <div class="container">
+            <div class="container-inner">
+                <div id="header-title">
+                    <h1 class="logo-wrap">
+                        <a href="/" class="logo"></a>
+                    </h1>
+                    
+                        <h2 class="subtitle-wrap">
+                            <p class="subtitle">病树前头花不发，柳暗花明柳成荫。</p>
+                        </h2>
+                    
+                </div>
+                <div id="header-inner" class="nav-container">
+                    <a id="main-nav-toggle" class="nav-icon fa fa-bars"></a>
+                    <div class="nav-container-inner">
+                        <ul id="main-nav">
+                            
+                                <li class="main-nav-list-item">
+                                    <a class="main-nav-list-link" href="/">主页</a>
+                                </li>
+                            
+                                        <ul class="main-nav-list"><li class="main-nav-list-item"><a class="main-nav-list-link" href="/categories/可视化/">可视化</a></li></ul>
+                                    
+                                <li class="main-nav-list-item">
+                                    <a class="main-nav-list-link" href="/about/index.html">关于</a>
+                                </li>
+                            
+                        </ul>
+                        <nav id="sub-nav">
+                            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索">
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么...">
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+        <div class="container">
+            <div class="main-body container-inner">
+                <div class="main-body-inner">
+                    <section id="main">
+                        <div class="main-body-header">
+    <h1 class="header">
+    
+    <a class="page-title-link" href="/categories/可视化/">可视化</a>
+    </h1>
+</div>
+
+                        <div class="main-body-content">
+                            <article id="post-Matplotlib绘制动态实时曲线的方法改进" class="article article-single article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+        Matplotlib绘制动态实时曲线的方法改进
+        </h1>
+    
+
+            </header>
+        
+        
+            <div class="article-meta">
+                
+    <div class="article-date">
+        <a href="/2019/201905p1/" class="article-date">
+            <time datetime="2019-05-04T01:51:38.000Z" itemprop="datePublished">2019-05-04</time>
+        </a>
+    </div>
+
+		
+
+                
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Python/">Python</a>, <a class="tag-link" href="/tags/matplotlib/">matplotlib</a>
+    </div>
+
+            </div>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+            <ul>
+<li>很多时候，我们需要实时的绘制曲线，如实时的绘制串口接收到的数据。最先想到的解决策略是类似于Matlab种的<code>drawnow</code>函数。</li>
+<li>在python中Matplotlib库有着和Matlan绘图库相似的功能，但是并没有<code>drawnow</code>这样的函数。 <h4 id="已有的解决方案"><a href="#已有的解决方案" class="headerlink" title="已有的解决方案"></a>已有的解决方案</h4></li>
+<li>通过网上现有的资料 <a href="https://www.cnblogs.com/DHUtoBUAA/p/6619099.html" target="_blank" rel="noopener">基于Python实现matplotlib中动态更新图片(交互式绘图)</a>，可以通过打开Matplotlib的交互模式来实现实时绘图的目的，此时需要用到函数<code>matplotlib.pyplot.ion</code><h4 id="存在的问题"><a href="#存在的问题" class="headerlink" title="存在的问题"></a>存在的问题</h4></li>
+<li>通过上述方法实时绘图，存在一个严重的问题:<strong>随着时间推移，CPU消耗越大，费时越多</strong>，最终导致<strong>程序卡顿</strong>。这显然无法满足我们实时绘图的要求。</li>
+<li><p>以下通过<code>time</code>模块计算每一步的耗时，直观地表现这一现象。</p>
+<ul>
+<li><p>完整代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Method</span><span class="params">(point)</span>:</span></span><br><span class="line">    es_time = np.zeros([point]) </span><br><span class="line">    fig=plt.figure()</span><br><span class="line">    ax=fig.add_subplot(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line">    ax.axis(<span class="string">"equal"</span>) <span class="comment">#设置图像显示的时候XY轴比例</span></span><br><span class="line">    ax.set_xlabel(<span class="string">'Horizontal Position'</span>)</span><br><span class="line">    ax.set_ylabel(<span class="string">'Vertical Position'</span>)</span><br><span class="line">    ax.set_title(<span class="string">'Vessel trajectory'</span>)</span><br><span class="line">    plt.grid(<span class="literal">True</span>) <span class="comment">#添加网格</span></span><br><span class="line">    plt.ion()  <span class="comment">#interactive mode on</span></span><br><span class="line">    IniObsX=<span class="number">0000</span></span><br><span class="line">    IniObsY=<span class="number">4000</span></span><br><span class="line">    IniObsAngle=<span class="number">135</span></span><br><span class="line">    IniObsSpeed=<span class="number">10</span>*math.sqrt(<span class="number">2</span>)   <span class="comment">#米/秒</span></span><br><span class="line">    print(<span class="string">'开始仿真'</span>)</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> range(point):</span><br><span class="line">        t0 = time.time()</span><br><span class="line">        <span class="comment">#障碍物船只轨迹</span></span><br><span class="line">        obsX=IniObsX+IniObsSpeed*math.sin(IniObsAngle/<span class="number">180</span>*math.pi)*t</span><br><span class="line">        obsY=IniObsY+IniObsSpeed*math.cos(IniObsAngle/<span class="number">180</span>*math.pi)*t</span><br><span class="line">        ax.scatter(obsX,obsY,c=<span class="string">'b'</span>,marker=<span class="string">'.'</span>)  <span class="comment">#散点图</span></span><br><span class="line">        <span class="comment">#下面的图,两船的距离</span></span><br><span class="line">        plt.pause(<span class="number">0.001</span>)</span><br><span class="line">        es_time[t] = <span class="number">1000</span>*(time.time() - t0)</span><br><span class="line">    <span class="keyword">return</span> es_time</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>耗时结果<br><img src="https://upload-images.jianshu.io/upload_images/7906342-8c69a9ccbe4ee0b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Method"></p>
+</li>
+</ul>
+</li>
+<li>很显然每步绘图时间与绘图点数呈线性相关的趋势，且随着点数增加，时间消耗越多。可以想象，当绘图的点数到达上万乃至亿的时候，那电脑就卡住了。<h4 id="分析原因"><a href="#分析原因" class="headerlink" title="分析原因"></a>分析原因</h4></li>
+<li>个人猜测出现上述这种现象的原因，是由代码<code>ax.scatter(obsX,obsY,c=&#39;b&#39;,marker=&#39;.&#39;)</code>造成的。这段代码每一循环一次就新画一条曲线，而不清除之前的曲线，这就必然导致越往后循环所花费的CPU资源内存资源越多，最终机器卡死。<h4 id="改进方法"><a href="#改进方法" class="headerlink" title="改进方法"></a>改进方法</h4></li>
+<li>既然原因是因为不断重复画图所致，导致机器资源的累积消耗，所以想到的第一个解决方法，那就是<strong>每次画图前，清除之前的曲线</strong>。</li>
+<li><p>根据上述思想，在每一次的画图代码<code>ax.scatter(obsX,obsY,c=&#39;b&#39;,marker=&#39;.&#39;)</code>前加上清除代码<code>plt.cla()</code>。即：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plt.cla()</span><br><span class="line">ax.plot(obsX,obsY,<span class="string">'-g'</span>,marker=<span class="string">'*'</span>)  <span class="comment">#散点图</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可是这样做之后就会存在<strong>新的问题</strong>：之前定义的坐标轴，标题，图例等等信息就都被清除了。<strong>解决方法</strong>则，需要在每一步的循环中，重新定义这些信息。</p>
+</li>
+<li><p>完整代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Method_Improve</span><span class="params">(point)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">initial</span><span class="params">(ax)</span>:</span></span><br><span class="line">        ax.axis(<span class="string">"equal"</span>) <span class="comment">#设置图像显示的时候XY轴比例</span></span><br><span class="line">        ax.set_xlabel(<span class="string">'Horizontal Position'</span>)</span><br><span class="line">        ax.set_ylabel(<span class="string">'Vertical Position'</span>)</span><br><span class="line">        ax.set_title(<span class="string">'Vessel trajectory'</span>)</span><br><span class="line">        plt.grid(<span class="literal">True</span>) <span class="comment">#添加网格</span></span><br><span class="line">        <span class="keyword">return</span> ax</span><br><span class="line">    </span><br><span class="line">    es_time = np.zeros([point]) </span><br><span class="line">    fig=plt.figure()</span><br><span class="line">    ax=fig.add_subplot(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line">    ax = initial(ax)</span><br><span class="line">    plt.ion()  <span class="comment">#interactive mode on</span></span><br><span class="line">    IniObsX=<span class="number">0</span></span><br><span class="line">    IniObsY=<span class="number">4000</span></span><br><span class="line">    IniObsAngle=<span class="number">135</span></span><br><span class="line">    IniObsSpeed=<span class="number">10</span>*math.sqrt(<span class="number">2</span>)   <span class="comment">#米/秒</span></span><br><span class="line">    print(<span class="string">'开始仿真'</span>)</span><br><span class="line">    obsX = [<span class="number">0</span>,]</span><br><span class="line">    obsY = [<span class="number">4000</span>,]</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> range(point):</span><br><span class="line">        t0 = time.time()</span><br><span class="line">        <span class="comment">#障碍物船只轨迹</span></span><br><span class="line">        obsX.append(IniObsX+IniObsSpeed*math.sin(IniObsAngle/<span class="number">180</span>*math.pi)*t)</span><br><span class="line">        obsY.append(IniObsY+IniObsSpeed*math.cos(IniObsAngle/<span class="number">180</span>*math.pi)*t)</span><br><span class="line">        plt.cla()</span><br><span class="line">        ax = initial(ax)</span><br><span class="line">        ax.plot(obsX,obsY,<span class="string">'-g'</span>,marker=<span class="string">'*'</span>)  <span class="comment">#散点图</span></span><br><span class="line">        <span class="comment">#下面的图,两船的距离</span></span><br><span class="line">        plt.pause(<span class="number">0.001</span>)</span><br><span class="line">        es_time[t] = <span class="number">1000</span>*(time.time() - t0)</span><br><span class="line">    <span class="keyword">return</span> es_time</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>耗时结果<br><img src="https://upload-images.jianshu.io/upload_images/7906342-34d4732583d122f7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Method_Improve"></p>
+</li>
+<li>显然循环次数与耗时不再呈正相关趋势，可以说是在一定误差范围内，耗时保持稳定。<h4 id="改进方法的改进"><a href="#改进方法的改进" class="headerlink" title="改进方法的改进"></a>改进方法的改进</h4></li>
+<li>改进方法中仍存在一个问题：由于每次循环都需要清除坐标轴信息，那么每次循环也必须再重新设置坐标轴信息。显然这种做法，导致了额外的算力消耗，那能否有新的方法，规避这种问题呢？答案显然是有的。</li>
+<li>但是解决思路还是得从原始问题出发，即重复画图，导致资源的累积消耗。所以令一种新的思路：<strong>只画一条(需要数量的)曲线，每次循环更改这些曲线的数据</strong>。</li>
+<li>那么按照上述思路之后，只需程序开头定义好坐标轴信息，而不需要每次循环内清除重设坐标轴信息。</li>
+<li>具体做法，就是获取曲线的句柄，进行修改，即有：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">line.set_xdata(obsX)</span><br><span class="line">line.set_ydata(obsY)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>完整代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ImprovedMethod_Improve</span><span class="params">(point)</span>:</span>    </span><br><span class="line">    es_time = np.zeros([point]) </span><br><span class="line">    fig=plt.figure()</span><br><span class="line">    ax=fig.add_subplot(<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    ax.set_xlabel(<span class="string">'Horizontal Position'</span>)</span><br><span class="line">    ax.set_ylabel(<span class="string">'Vertical Position'</span>)</span><br><span class="line">    ax.set_title(<span class="string">'Vessel trajectory'</span>)</span><br><span class="line">    </span><br><span class="line">    line = ax.plot([<span class="number">0</span>,<span class="number">0</span>],[<span class="number">4000</span>,<span class="number">4000</span>],<span class="string">'-g'</span>,marker=<span class="string">'*'</span>)[<span class="number">0</span>]</span><br><span class="line">    plt.grid(<span class="literal">True</span>) <span class="comment">#添加网格</span></span><br><span class="line">    plt.ion()  <span class="comment">#interactive mode on</span></span><br><span class="line">    IniObsX=<span class="number">0000</span></span><br><span class="line">    IniObsY=<span class="number">4000</span></span><br><span class="line">    IniObsAngle=<span class="number">135</span></span><br><span class="line">    IniObsSpeed=<span class="number">10</span>*math.sqrt(<span class="number">2</span>)   <span class="comment">#米/秒</span></span><br><span class="line">    print(<span class="string">'开始仿真'</span>)</span><br><span class="line">    obsX = [<span class="number">0</span>,]</span><br><span class="line">    obsY = [<span class="number">4000</span>,]</span><br><span class="line">    <span class="keyword">for</span> t <span class="keyword">in</span> range(point):</span><br><span class="line">        t0 = time.time()</span><br><span class="line">        <span class="comment">#障碍物船只轨迹</span></span><br><span class="line">        obsX.append(IniObsX+IniObsSpeed*math.sin(IniObsAngle/<span class="number">180</span>*math.pi)*t)</span><br><span class="line">        obsY.append(IniObsY+IniObsSpeed*math.cos(IniObsAngle/<span class="number">180</span>*math.pi)*t)</span><br><span class="line">        </span><br><span class="line">        line.set_xdata(obsX)</span><br><span class="line">        line.set_ydata(obsY)</span><br><span class="line">        ax.set_xlim([<span class="number">-200</span>,<span class="number">10</span>*point+<span class="number">200</span>])</span><br><span class="line">        ax.set_ylim([<span class="number">3800</span><span class="number">-10</span>*point,<span class="number">4200</span>])</span><br><span class="line">        <span class="comment">#下面的图,两船的距离</span></span><br><span class="line">        plt.pause(<span class="number">0.001</span>)</span><br><span class="line">        es_time[t] = <span class="number">1000</span>*(time.time() - t0)</span><br><span class="line">    <span class="keyword">return</span> es_time</span><br></pre></td></tr></table></figure></p>
+<h4 id="三种方法对比"><a href="#三种方法对比" class="headerlink" title="三种方法对比"></a>三种方法对比</h4><p><img src="https://upload-images.jianshu.io/upload_images/7906342-8f365d47fb687bec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="三种方法对比"></p>
+
+        </div>
+        <footer class="article-footer">
+            
+
+
+
+    <a data-url="http://naotudi.top/2019/201905p1/" data-id="cjv9lbjzs0001lk7k2f0b2i64" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+			阅读数量:<span id="/2019/201905p1/" class="leancloud_visitors" data-flag-title="Matplotlib绘制动态实时曲线的方法改进"></span>次
+        </footer>
+    </div>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "author": {
+            "@type": "Person",
+            "name": "NaoTuDi"
+        },
+        "headline": "Matplotlib绘制动态实时曲线的方法改进",
+        "image": "http://naotudi.tophttps://upload-images.jianshu.io/upload_images/7906342-8c69a9ccbe4ee0b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240",
+        "keywords": "Python matplotlib",
+        "genre": "可视化",
+        "datePublished": "2019-05-04",
+        "dateCreated": "2019-05-04",
+        "dateModified": "2019-05-04",
+        "url": "http://naotudi.top/2019/201905p1/",
+        "description": "
+很多时候，我们需要实时的绘制曲线，如实时的绘制串口接收到的数据。最先想到的解决策略是类似于Matlab种的drawnow函数。
+在python中Matplotlib库有着和Matlan绘图库相似的功能，但是并没有drawnow这样的函数。 已有的解决方案
+通过网上现有的资料 基于Python实现matplotlib中动态更新图片(交互式绘图)，可以通过打开Matplotlib的交互模式来实现实时"
+        "wordCount": 963
+    }
+</script>
+
+</article>
+<!-- 来必力City版安装代码 -->
+<div id="lv-container" data-id="city" data-uid="MTAyMC80NDA2NC8yMDU5OQ==">
+	<script type="text/javascript">
+   (function(d, s) {
+       var j, e = d.getElementsByTagName(s)[0];
+
+       if (typeof LivereTower === 'function') { return; }
+
+       j = d.createElement(s);
+       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+       j.async = true;
+
+       e.parentNode.insertBefore(j, e);
+   })(document, 'script');
+	</script>
+<noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+</div>
+<!-- City版安装代码已完成 -->
+
+                        </div>
+                    </section>
+                    <aside id="sidebar">
+    <a class="sidebar-toggle" title="Expand Sidebar"><i class="toggle icon"></i></a>
+    <div class="sidebar-top">
+        <p>关注我 :</p>
+        <ul class="social-links">
+            
+                
+                <li>
+                    <a class="social-tooltip" title="comment" href="https://www.jianshu.com/u/c23ceb73323b" target="_blank" rel="noopener">
+                        <i class="icon fa fa-comment"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="comments" href="https://blog.csdn.net/eaglesimu" target="_blank" rel="noopener">
+                        <i class="icon fa fa-comments"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="github" href="https://github.com/XuJiaCheng1993" target="_blank" rel="noopener">
+                        <i class="icon fa fa-github"></i>
+                    </a>
+                </li>
+                
+            
+                
+                <li>
+                    <a class="social-tooltip" title="weixin" href="https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzI2NjU1NTg1NQ==#wechat_redirect" target="_blank" rel="noopener">
+                        <i class="icon fa fa-weixin"></i>
+                    </a>
+                </li>
+                
+            
+        </ul>
+    </div>
+    
+        
+    
+    <div class="widgets-container">
+        
+            
+                
+
+            
+                
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/201905p1/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://upload-images.jianshu.io/upload_images/7906342-8c69a9ccbe4ee0b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)" alt="Matplotlib绘制动态实时曲线的方法改进" class="thumbnail-image"></span>
+    
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/可视化/">可视化</a></p>
+                            <p class="item-title"><a href="/2019/201905p1/" class="title">Matplotlib绘制动态实时曲线的方法改进</a></p>
+                            <p class="item-date"><time datetime="2019-05-04T01:51:38.000Z" itemprop="datePublished">2019-05-04</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/可视化/">可视化</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/matplotlib/">matplotlib</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-float">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/matplotlib/" style="font-size: 10px;">matplotlib</a>
+        </div>
+    </div>
+
+
+            
+                
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+            
+        
+    </div>
+</aside>
+
+                </div>
+            </div>
+        </div>
+        <footer id="footer">
+    <div class="container">
+        <div class="container-inner">
+            <a id="back-to-top" href="javascript:;"><i class="icon fa fa-angle-up"></i></a>
+            <div class="credit">
+                <h1 class="logo-wrap">
+                    <a href="/" class="logo"></a>
+                </h1>
+                <p>&copy; 2019 NaoTuDi</p>
+                <p>Powered by <a href="//hexo.io/" target="_blank">Hexo</a>. Theme by <a href="//github.com/ppoffice" target="_blank">PPOffice</a></p>
+                <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+                <span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+				<span id="busuanzi_container_site_uv">本站访客数<span id="busuanzi_value_site_uv"></span>人次</span>
+            </div>
+            <div class="footer-plugins">
+              
+    
+
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="//cdn1.lncld.net/static/js/2.5.0/av-min.js"></script>
+<script>
+    var APP_ID = '0vLfGfpqYPueuQJ7CIH03Dak-gzGzoHsz';
+    var APP_KEY = 'Po5xNQC6GsndJdA6Ds8n86k9';
+    AV.init({
+        appId: APP_ID,
+        appKey: APP_KEY
+    });
+    // 显示次数
+    function showTime(Counter) {
+        var query = new AV.Query("Counter");
+        if($(".leancloud_visitors").length > 0){
+            var url = $(".leancloud_visitors").attr('id').trim();
+            // where field
+            query.equalTo("words", url);
+            // count
+            query.count().then(function (number) {
+                // There are number instances of MyClass where words equals url.
+                $(document.getElementById(url)).text(number?  number : '--');
+            }, function (error) {
+                // error is an instance of AVError.
+            });
+        }
+    }
+    // 追加pv
+    function addCount(Counter) {
+        var url = $(".leancloud_visitors").length > 0 ? $(".leancloud_visitors").attr('id').trim() : 'icafebolger.com';
+        var Counter = AV.Object.extend("Counter");
+        var query = new Counter;
+        query.save({
+            words: url
+        }).then(function (object) {
+        })
+    }
+    $(function () {
+        var Counter = AV.Object.extend("Counter");
+        addCount(Counter);
+        showTime(Counter);
+    });
+</script>
+        
+    
+    <script>
+    var disqus_shortname = 'hexo-theme-hueman';
+    
+    
+    var disqus_url = 'http://naotudi.top/2019/201905p1/';
+    
+    (function() {
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+    </script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
